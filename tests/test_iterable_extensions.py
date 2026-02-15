@@ -10,3 +10,26 @@ def test_where():
 
     # Assert
     assert list(result) == [5, 6, 7, 8]
+
+
+def test_select():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | select[int, tuple[int, int]](lambda x: (x, 2 * x))
+
+    # Assert
+    assert list(result) == [(1, 2), (2, 4), (3, 6)]
+
+
+def test_tolist():
+    # Assign
+    source = (x for x in [1, 2, 3])
+
+    # Act
+    result = source | to_list[int]()
+
+    # Assert
+    assert type(result) is list
+    assert result == [1, 2, 3]
