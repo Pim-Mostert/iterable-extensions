@@ -1,0 +1,13 @@
+{
+    "python.analysis.typeCheckingMode": "standard",
+    "python.languageServer": "Pylance",
+    "editor.codeActionsOnSave": {
+        "source.fixAll": "always",
+        "source.organizeImports.ruff": "always"
+    },
+    "python.testing.pytestArgs": [
+        "tests"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
