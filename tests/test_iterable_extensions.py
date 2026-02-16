@@ -23,7 +23,7 @@ def test_select():
     assert list(result) == [(1, 2), (2, 4), (3, 6)]
 
 
-def test_tolist():
+def test_to_list():
     # Assign
     source = (x for x in [1, 2, 3])
 
