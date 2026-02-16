@@ -1,4 +1,9 @@
-from iterable_extensions.iterable_extensions import select, to_list, where
+from iterable_extensions.iterable_extensions import (
+    select,
+    to_dictionary,
+    to_list,
+    where,
+)
 
 
 def test_where():
@@ -33,3 +38,38 @@ def test_to_list():
     # Assert
     assert type(result) is list
     assert result == [1, 2, 3]
+
+
+def test_to_dictionary_key():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | to_dictionary[int, int, int](
+        lambda x: 2 * x,
+    )
+
+    # Assert
+    assert type(result) is dict
+    assert len(result) == 3
+
+    for x in source:
+        assert result[2 * x] == x
+
+
+def test_to_dictionary_key_and_element():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | to_dictionary[int, int, str](
+        lambda x: 2 * x,
+        lambda x: str(x),
+    )
+
+    # Assert
+    assert type(result) is dict
+    assert len(result) == 3
+
+    for x in source:
+        assert result[2 * x] == str(x)
