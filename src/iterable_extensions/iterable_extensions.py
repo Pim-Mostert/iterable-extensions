@@ -1,7 +1,23 @@
-from collections.abc import Callable, Iterable
+import itertools
+from collections.abc import Callable, Iterable, Iterator
 from typing import cast, overload
 
 from extensionmethods import Extension
+
+from iterable_extensions.types import Grouping, SupportsComparison
+
+
+class ReusableIterable[TSource, TResult](Iterable[TResult]):
+    def __init__(
+        self,
+        source: Iterable[TSource],
+        func: Callable[[Iterable[TSource]], Iterator[TResult]],
+    ):
+        self._source = source
+        self._func = func
+
+    def __iter__(self) -> Iterator[TResult]:
+        return self._func(self._source)
 
 
 class where[TSource](Extension[Iterable[TSource], [], Iterable[TSource]]):
@@ -10,7 +26,10 @@ class where[TSource](Extension[Iterable[TSource], [], Iterable[TSource]]):
         predicate: Callable[[TSource], bool],
     ):
         def _where(source: Iterable[TSource]) -> Iterable[TSource]:
-            return filter(predicate, source)
+            def _func(source: Iterable[TSource]) -> Iterator[TSource]:
+                return (x for x in source if predicate(x))
+
+            return ReusableIterable(source, _func)
 
         super().__init__(_where)
 
@@ -21,7 +40,10 @@ class select[TSource, TResult](Extension[Iterable[TSource], [], Iterable[TResult
         selector: Callable[[TSource], TResult],
     ):
         def _select(source: Iterable[TSource]) -> Iterable[TResult]:
-            return map(selector, source)
+            def _func(source: Iterable[TSource]) -> Iterator[TResult]:
+                return map(selector, source)
+
+            return ReusableIterable(source, _func)
 
         super().__init__(_select)
 
@@ -66,18 +88,7 @@ class to_dictionary[TSource, TKey, TElement](
         super().__init__(_to_dictionary)
 
 
-class order_by[TSource, TKey](Extension[Iterable[TSource], [], Iterable[TSource]]):
-    def __init__(
-        self,
-        key_selector: Callable[[TSource], TKey],
-    ):
-        def _order_by(source: Iterable[TSource]) -> Iterable[TSource]:
-            return sorted(source, key=key_selector)  # pyright: ignore[reportCallIssue, reportArgumentType]
-
-        super().__init__(_order_by)
-
-
-class order_by_descending[TSource, TKey](
+class order_by[TSource, TKey: SupportsComparison](
     Extension[Iterable[TSource], [], Iterable[TSource]]
 ):
     def __init__(
@@ -85,6 +96,19 @@ class order_by_descending[TSource, TKey](
         key_selector: Callable[[TSource], TKey],
     ):
         def _order_by(source: Iterable[TSource]) -> Iterable[TSource]:
-            return sorted(source, key=key_selector, reverse=True)  # pyright: ignore[reportCallIssue, reportArgumentType]
+            return sorted(source, key=key_selector)
+
+        super().__init__(_order_by)
+
+
+class order_by_descending[TSource, TKey: SupportsComparison](
+    Extension[Iterable[TSource], [], Iterable[TSource]]
+):
+    def __init__(
+        self,
+        key_selector: Callable[[TSource], TKey],
+    ):
+        def _order_by(source: Iterable[TSource]) -> Iterable[TSource]:
+            return sorted(source, key=key_selector, reverse=True)
 
         super().__init__(_order_by)

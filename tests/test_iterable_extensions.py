@@ -17,6 +17,7 @@ def test_where():
 
     # Assert
     assert list(result) == [5, 6, 7, 8]
+    assert list(result) == [5, 6, 7, 8]  # Test reusable iterable
 
 
 def test_select():
@@ -28,6 +29,7 @@ def test_select():
 
     # Assert
     assert list(result) == [(1, 2), (2, 4), (3, 6)]
+    assert list(result) == [(1, 2), (2, 4), (3, 6)]  # Test reusable iterable
 
 
 def test_to_list():
@@ -86,6 +88,7 @@ def test_order_by():
 
     # Assert
     assert list(result) == [1, 2, 3, 4, 5]
+    assert list(result) == [1, 2, 3, 4, 5]  # Test reusable iterable
 
 
 def test_order_by_descending():
@@ -97,3 +100,4 @@ def test_order_by_descending():
 
     # Assert
     assert list(result) == [5, 4, 3, 2, 1]
+    assert list(result) == [5, 4, 3, 2, 1]  # Test reusable iterable
