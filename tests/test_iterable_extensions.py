@@ -1,4 +1,6 @@
 from iterable_extensions.iterable_extensions import (
+    order_by,
+    order_by_descending,
     select,
     to_dictionary,
     to_list,
@@ -73,3 +75,25 @@ def test_to_dictionary_key_and_element():
 
     for x in source:
         assert result[2 * x] == str(x)
+
+
+def test_order_by():
+    # Assign
+    source = [3, 5, 1, 2, 4]
+
+    # Act
+    result = source | order_by[int, int](lambda x: x)
+
+    # Assert
+    assert list(result) == [1, 2, 3, 4, 5]
+
+
+def test_order_by_descending():
+    # Assign
+    source = [3, 5, 1, 2, 4]
+
+    # Act
+    result = source | order_by_descending[int, int](lambda x: x)
+
+    # Assert
+    assert list(result) == [5, 4, 3, 2, 1]

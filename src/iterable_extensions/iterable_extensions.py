@@ -64,3 +64,27 @@ class to_dictionary[TSource, TKey, TElement](
                 return {key_selector(x): cast(TElement, x) for x in source}
 
         super().__init__(_to_dictionary)
+
+
+class order_by[TSource, TKey](Extension[Iterable[TSource], [], Iterable[TSource]]):
+    def __init__(
+        self,
+        key_selector: Callable[[TSource], TKey],
+    ):
+        def _order_by(source: Iterable[TSource]) -> Iterable[TSource]:
+            return sorted(source, key=key_selector)  # pyright: ignore[reportCallIssue, reportArgumentType]
+
+        super().__init__(_order_by)
+
+
+class order_by_descending[TSource, TKey](
+    Extension[Iterable[TSource], [], Iterable[TSource]]
+):
+    def __init__(
+        self,
+        key_selector: Callable[[TSource], TKey],
+    ):
+        def _order_by(source: Iterable[TSource]) -> Iterable[TSource]:
+            return sorted(source, key=key_selector, reverse=True)  # pyright: ignore[reportCallIssue, reportArgumentType]
+
+        super().__init__(_order_by)
