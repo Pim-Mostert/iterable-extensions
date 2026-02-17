@@ -7,45 +7,78 @@ from extensionmethods import Extension
 from iterable_extensions.types import Grouping, SupportsComparison
 
 
-class ReusableIterable[TSource, TResult](Iterable[TResult]):
+class ReusableIterable[TIn, TOut](Iterable[TOut]):
     def __init__(
         self,
-        source: Iterable[TSource],
-        func: Callable[[Iterable[TSource]], Iterator[TResult]],
+        source: Iterable[TIn],
+        func: Callable[[Iterable[TIn]], Iterator[TOut]],
     ):
+
         self._source = source
         self._func = func
 
-    def __iter__(self) -> Iterator[TResult]:
+    def __iter__(self) -> Iterator[TOut]:
         return self._func(self._source)
 
 
-class where[TSource](Extension[Iterable[TSource], [], Iterable[TSource]]):
+class where[T](
+    Extension[
+        Iterable[T],
+        [Callable[[T], bool]],
+        Iterable[T],
+    ]
+):
     def __init__(
         self,
-        predicate: Callable[[TSource], bool],
+        predicate: Callable[[T], bool],
     ):
-        def _where(source: Iterable[TSource]) -> Iterable[TSource]:
-            def _func(source: Iterable[TSource]) -> Iterator[TSource]:
+        """where
+
+        Args:
+            predicate (Callable[[T], bool]): ja mooi
+
+        Example:
+            ```
+            result = source | where[int](lambda x: x > 2)
+            ```
+        """
+
+        def _where(source: Iterable[T], predicate: Callable[[T], bool]) -> Iterable[T]:
+
+            def _func(source: Iterable[T]) -> Iterator[T]:
                 return (x for x in source if predicate(x))
 
             return ReusableIterable(source, _func)
 
-        super().__init__(_where)
+        super().__init__(_where, predicate)
 
 
-class select[TSource, TResult](Extension[Iterable[TSource], [], Iterable[TResult]]):
+class select[TIn, TOut](
+    Extension[
+        Iterable[TIn],
+        [Callable[[TIn], TOut]],
+        Iterable[TOut],
+    ]
+):
     def __init__(
         self,
-        selector: Callable[[TSource], TResult],
+        selector: Callable[[TIn], TOut],
     ):
-        def _select(source: Iterable[TSource]) -> Iterable[TResult]:
-            def _func(source: Iterable[TSource]) -> Iterator[TResult]:
+        """This is the select class
+
+        Args:
+            selector (Callable[[TIn], TOut]): The selector
+        """
+
+        def _select(
+            source: Iterable[TIn], selector: Callable[[TIn], TOut]
+        ) -> Iterable[TOut]:
+            def _func(source: Iterable[TIn]) -> Iterator[TOut]:
                 return map(selector, source)
 
             return ReusableIterable(source, _func)
 
-        super().__init__(_select)
+        super().__init__(_select, selector)
 
 
 class to_list[T](Extension[Iterable[T], [], Iterable[T]]):
@@ -55,80 +88,107 @@ class to_list[T](Extension[Iterable[T], [], Iterable[T]]):
         super().__init__(list)
 
 
-class to_dictionary[TSource, TKey, TElement](
-    Extension[Iterable[TSource], [], dict[TKey, TElement]]
+class to_dictionary[T, TKey, TValue](
+    Extension[
+        Iterable[T],
+        [Callable[[T], TKey], Callable[[T], TValue] | None],
+        dict[TKey, TValue],
+    ]
 ):
     @overload
     def __init__(
         self,
-        key_selector: Callable[[TSource], TKey],
+        key_selector: Callable[[T], TKey],
     ): ...
 
     @overload
     def __init__(
         self,
-        key_selector: Callable[[TSource], TKey],
-        element_selector: Callable[[TSource], TElement],
+        key_selector: Callable[[T], TKey],
+        value_selector: Callable[[T], TValue],
     ): ...
 
     def __init__(
         self,
-        key_selector: Callable[[TSource], TKey],
-        element_selector: Callable[[TSource], TElement] | None = None,
+        key_selector: Callable[[T], TKey],
+        value_selector: Callable[[T], TValue] | None = None,
     ):
-        if element_selector:
+        """to_dictionary main
 
-            def _to_dictionary(source: Iterable[TSource]) -> dict[TKey, TElement]:
+        Args:
+            key_selector (Callable[[TIn], TKey]): _description_
+            value_selector (Callable[[TIn], TValue] | None, optional): _description_. Defaults to None.
+        """
+        if value_selector:
+
+            def _to_dictionary_key_element(
+                source: Iterable[T],
+                key_selector,
+                element_selector,
+            ) -> dict[TKey, TValue]:
                 return {key_selector(x): element_selector(x) for x in source}
+
+            _to_dictionary = _to_dictionary_key_element
         else:
 
-            def _to_dictionary(source: Iterable[TSource]) -> dict[TKey, TElement]:
-                return {key_selector(x): cast(TElement, x) for x in source}
+            def _to_dictionary_key(
+                source: Iterable[T],
+                key_selector,
+                _,
+            ) -> dict[TKey, TValue]:
+                return {key_selector(x): cast(TValue, x) for x in source}
 
-        super().__init__(_to_dictionary)
+            _to_dictionary = _to_dictionary_key
+
+        super().__init__(_to_dictionary, key_selector, value_selector)
 
 
-class order_by[TSource, TKey: SupportsComparison](
-    Extension[Iterable[TSource], [], Iterable[TSource]]
+class order_by[T, TKey: SupportsComparison](
+    Extension[Iterable[T], [Callable[[T], TKey]], Iterable[T]]
 ):
     def __init__(
         self,
-        key_selector: Callable[[TSource], TKey],
+        key_selector: Callable[[T], TKey],
     ):
-        def _order_by(source: Iterable[TSource]) -> Iterable[TSource]:
+        def _order_by(
+            source: Iterable[T], key_selector: Callable[[T], TKey]
+        ) -> Iterable[T]:
             return sorted(source, key=key_selector)
 
-        super().__init__(_order_by)
+        super().__init__(_order_by, key_selector)
 
 
-class order_by_descending[TSource, TKey: SupportsComparison](
-    Extension[Iterable[TSource], [], Iterable[TSource]]
+class order_by_descending[T, TKey: SupportsComparison](
+    Extension[Iterable[T], [Callable[[T], TKey]], Iterable[T]]
 ):
     def __init__(
         self,
-        key_selector: Callable[[TSource], TKey],
+        key_selector: Callable[[T], TKey],
     ):
-        def _order_by(source: Iterable[TSource]) -> Iterable[TSource]:
+        def _order_by(
+            source: Iterable[T], key_selector: Callable[[T], TKey]
+        ) -> Iterable[T]:
             return sorted(source, key=key_selector, reverse=True)
 
-        super().__init__(_order_by)
+        super().__init__(_order_by, key_selector)
 
 
-class group_by[TKey: SupportsComparison, TSource](
+class group_by[T, TKey: SupportsComparison](
     Extension[
-        Iterable[TSource],
-        [],
-        Iterable[Grouping[TKey, TSource]],
+        Iterable[T],
+        [Callable[[T], TKey]],
+        Iterable[Grouping[TKey, T]],
     ]
 ):
     def __init__(
         self,
-        key_selector: Callable[[TSource], TKey],
+        key_selector: Callable[[T], TKey],
     ):
         def _group_by(
-            source: Iterable[TSource],
-        ) -> Iterable[Grouping[TKey, TSource]]:
-            def _func(source: Iterable[TSource]) -> Iterator[Grouping]:
+            source: Iterable[T],
+            key_selector: Callable[[T], TKey],
+        ) -> Iterable[Grouping[TKey, T]]:
+            def _func(source: Iterable[T]) -> Iterator[Grouping]:
                 groups = itertools.groupby(
                     sorted(source, key=key_selector),
                     key=key_selector,
@@ -139,12 +199,12 @@ class group_by[TKey: SupportsComparison, TSource](
 
             return ReusableIterable(source, _func)
 
-        super().__init__(_group_by)
+        super().__init__(_group_by, key_selector)
 
 
-class count[TSource](Extension[Iterable[TSource], [], int]):
+class count[T](Extension[Iterable[T], [], int]):
     def __init__(self):
-        def _count(source: Iterable[TSource]) -> int:
+        def _count(source: Iterable[T]) -> int:
             total = 0
             for _ in source:
                 total += 1
