@@ -1,3 +1,3 @@
 # iterable-extensions
 
-Documentation: https://iterable-extensions.readthedocs.io/en/latest/
+Documentation: [https://iterable-extensions.readthedocs.io/](https://iterable-extensions.readthedocs.io/)
