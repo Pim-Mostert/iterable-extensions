@@ -6,8 +6,14 @@ nav:
 
 theme: material
 
+site_url: !ENV READTHEDOCS_CANONICAL_URL
+
 watch:
   - src
+
+markdown_extensions:
+  - markdown_include.include:
+      base_path: .
 
 plugins:
   - search
