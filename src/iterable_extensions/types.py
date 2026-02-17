@@ -12,3 +12,18 @@ class SupportsLessThan[T](Protocol):
 
 SupportsComparison = SupportsGreaterThan | SupportsLessThan
 
+
+class Grouping[TKey, TSource]:
+    def __repr__(self) -> str:
+        return f"{self._key}: {self._source}"
+
+    def __init__(self, key: TKey, source: Iterable[TSource]):
+        self._key = key
+        self._source = source
+
+    @property
+    def key(self):
+        return self._key
+
+    def __iter__(self):
+        return iter(self._source)

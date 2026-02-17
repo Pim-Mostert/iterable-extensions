@@ -1,4 +1,5 @@
 from iterable_extensions.iterable_extensions import (
+    group_by,
     order_by,
     order_by_descending,
     select,
@@ -16,8 +17,8 @@ def test_where():
     result = source | where[int](lambda x: x > 4)
 
     # Assert
-    assert list(result) == [5, 6, 7, 8]
-    assert list(result) == [5, 6, 7, 8]  # Test reusable iterable
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == [5, 6, 7, 8]
 
 
 def test_select():
@@ -28,8 +29,8 @@ def test_select():
     result = source | select[int, tuple[int, int]](lambda x: (x, 2 * x))
 
     # Assert
-    assert list(result) == [(1, 2), (2, 4), (3, 6)]
-    assert list(result) == [(1, 2), (2, 4), (3, 6)]  # Test reusable iterable
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == [(1, 2), (2, 4), (3, 6)]
 
 
 def test_to_list():
@@ -87,8 +88,8 @@ def test_order_by():
     result = source | order_by[int, int](lambda x: x)
 
     # Assert
-    assert list(result) == [1, 2, 3, 4, 5]
-    assert list(result) == [1, 2, 3, 4, 5]  # Test reusable iterable
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == [1, 2, 3, 4, 5]
 
 
 def test_order_by_descending():
@@ -99,5 +100,43 @@ def test_order_by_descending():
     result = source | order_by_descending[int, int](lambda x: x)
 
     # Assert
-    assert list(result) == [5, 4, 3, 2, 1]
-    assert list(result) == [5, 4, 3, 2, 1]  # Test reusable iterable
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == [5, 4, 3, 2, 1]
+
+
+def test_group_by():
+    class Person:
+        def __init__(self, age: int, name: str):
+            self.age = age
+            self.name = name
+
+    # Assign
+    source = [
+        Person(10, "Arthur"),
+        Person(10, "Becky"),
+        Person(20, "Chris"),
+        Person(30, "Dave"),
+        Person(30, "Eduardo"),
+        Person(30, "Felice"),
+    ]
+
+    # Act
+    groups = source | group_by[int, Person](lambda p: p.age)
+
+    # Assert
+    for _ in range(2):  # Test reusable iterable
+        groups_list = list(groups)
+        assert len(groups_list) == 3
+
+        for _ in range(2):  # Test reusable iterable
+            g0 = list(groups_list[0])
+            assert len(g0) == 2
+            assert [p.name for p in g0] == ["Arthur", "Becky"]
+
+            g1 = list(groups_list[1])
+            assert len(g1) == 1
+            assert [p.name for p in g1] == ["Chris"]
+
+            g2 = list(groups_list[2])
+            assert len(g2) == 3
+            assert [p.name for p in g2] == ["Dave", "Eduardo", "Felice"]

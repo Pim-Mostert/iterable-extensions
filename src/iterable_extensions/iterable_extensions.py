@@ -112,3 +112,31 @@ class order_by_descending[TSource, TKey: SupportsComparison](
             return sorted(source, key=key_selector, reverse=True)
 
         super().__init__(_order_by)
+
+
+class group_by[TKey: SupportsComparison, TSource](
+    Extension[
+        Iterable[TSource],
+        [],
+        Iterable[Grouping[TKey, TSource]],
+    ]
+):
+    def __init__(
+        self,
+        key_selector: Callable[[TSource], TKey],
+    ):
+        def _group_by(
+            source: Iterable[TSource],
+        ) -> Iterable[Grouping[TKey, TSource]]:
+            def _func(source: Iterable[TSource]) -> Iterator[Grouping]:
+                groups = itertools.groupby(
+                    sorted(source, key=key_selector),
+                    key=key_selector,
+                )
+
+                for key, elements in groups:
+                    yield Grouping(key, list(elements))
+
+            return ReusableIterable(source, _func)
+
+        super().__init__(_group_by)
