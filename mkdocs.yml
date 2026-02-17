@@ -9,6 +9,10 @@ theme: material
 watch:
   - src
 
+markdown_extensions:
+  - markdown_include.include:
+      base_path: .
+
 plugins:
   - search
   - mkdocstrings:
