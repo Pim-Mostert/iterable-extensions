@@ -6,6 +6,8 @@ nav:
 
 theme: material
 
+site_url: !ENV READTHEDOCS_CANONICAL_URL
+
 watch:
   - src
 
