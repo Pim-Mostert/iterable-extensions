@@ -140,3 +140,15 @@ class group_by[TKey: SupportsComparison, TSource](
             return ReusableIterable(source, _func)
 
         super().__init__(_group_by)
+
+
+class count[TSource](Extension[Iterable[TSource], [], int]):
+    def __init__(self):
+        def _count(source: Iterable[TSource]) -> int:
+            total = 0
+            for _ in source:
+                total += 1
+
+            return total
+
+        super().__init__(_count)

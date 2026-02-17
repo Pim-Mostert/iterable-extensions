@@ -1,4 +1,5 @@
 from iterable_extensions.iterable_extensions import (
+    count,
     group_by,
     order_by,
     order_by_descending,
@@ -140,3 +141,14 @@ def test_group_by():
             g2 = list(groups_list[2])
             assert len(g2) == 3
             assert [p.name for p in g2] == ["Dave", "Eduardo", "Felice"]
+
+
+def test_count():
+    # Assign
+    source = [1, 2, 3, 4, 5, 6, 7, 8]
+
+    # Act
+    result = source | count[int]()
+
+    # Assert
+    assert result == len(source)
