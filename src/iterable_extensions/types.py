@@ -14,6 +14,12 @@ SupportsComparison = SupportsGreaterThan | SupportsLessThan
 
 
 class Grouping[TKey, TSource]:
+    """A wrapper around an iterable, that also holds its grouping key.
+
+    Args
+        key: they key for this group
+    """
+
     def __repr__(self) -> str:
         return f"{self._key}: {self._source}"
 
@@ -23,6 +29,11 @@ class Grouping[TKey, TSource]:
 
     @property
     def key(self):
+        """Returns the key for this group.
+
+        Returns:
+            [TKey]: The key on which this group was based
+        """
         return self._key
 
     def __iter__(self):
