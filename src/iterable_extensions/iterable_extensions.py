@@ -289,20 +289,97 @@ class first_or_none[T](Extension[Iterable[T], [], T | None]):
             ```
             source = [4, 7, 2]
 
-            result = source | first()
+            result = source | first_or_none()
 
             print(result)
             # 4
             ```
         """
 
-        def _first(source: Iterable[T]) -> T | None:
+        def _first_or_none(source: Iterable[T]) -> T | None:
             try:
                 return next(iter(source))
             except StopIteration:
                 return None
 
-        super().__init__(_first)
+        super().__init__(_first_or_none)
+
+
+class single[T](Extension[Iterable[T], [], T]):
+    def __init__(
+        self,
+    ):
+        """Takes the single element of an iterable.
+
+        Raises:
+            ValueError: If the iterable contains no elements, or more than one.
+
+        Example:
+            ```
+            source = [4]
+
+            result = source | single()
+
+            print(result)
+            # 4
+            ```
+        """
+
+        def _single(source: Iterable[T]) -> T:
+            iterator = iter(source)
+
+            try:
+                value = next(iterator)
+
+                try:
+                    next(iterator)
+                except StopIteration:
+                    return value
+            except StopIteration:
+                raise ValueError("Iterable is empty.")
+
+            raise ValueError("Iterable contains more than one element.")
+
+        super().__init__(_single)
+
+
+class single_or_none[T](Extension[Iterable[T], [], T | None]):
+    def __init__(
+        self,
+    ):
+        """Takes the single element of an iterable, or returns None if
+        the iterable is empty.
+
+        Raises:
+            ValueError: If the iterable contains more than one element.
+
+        Example:
+            ```
+            source = [4]
+
+            result = source | single_or_none()
+
+            print(result)
+            # 4
+            ```
+        """
+
+        def _single_or_none(source: Iterable[T]) -> T | None:
+            iterator = iter(source)
+
+            try:
+                value = next(iterator)
+
+                try:
+                    next(iterator)
+                except StopIteration:
+                    return value
+            except StopIteration:
+                return None
+
+            raise ValueError("Iterable contains more than one element.")
+
+        super().__init__(_single_or_none)
 
 
 class to_dictionary[T, TKey, TValue](

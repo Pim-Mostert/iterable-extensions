@@ -8,6 +8,8 @@ from iterable_extensions.iterable_extensions import (
     order_by,
     order_by_descending,
     select,
+    single,
+    single_or_none,
     to_dictionary,
     to_list,
     where,
@@ -195,6 +197,66 @@ def test_first_or_none_empty_iterable():
 
     # Act
     result = source | first_or_none()
+
+    # Assert
+    assert result is None
+
+
+def test_single():
+    # Assign
+    source = [5]
+
+    # Act
+    result = source | single()
+
+    # Assert
+    assert result == 5
+
+
+def test_single_more_than_one_element():
+    # Assign
+    source = [5, 4]
+
+    # Act
+    with pytest.raises(ValueError):
+        source | single()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_single_empty_iterable():
+    # Assign
+    source = []
+
+    # Act
+    with pytest.raises(ValueError):
+        source | single()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_single_or_none():
+    # Assign
+    source = [5]
+
+    # Act
+    result = source | single_or_none()
+
+    # Assert
+    assert result == 5
+
+
+def test_single_or_none_more_than_one_element():
+    # Assign
+    source = [5, 4]
+
+    # Act
+    with pytest.raises(ValueError):
+        source | single_or_none()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_single_or_none_empty_iterable():
+    # Assign
+    source = []
+
+    # Act
+    result = source | single_or_none()
 
     # Assert
     assert result is None

@@ -15,6 +15,10 @@
 ---
 ::: iterable_extensions.select
 ---
+::: iterable_extensions.single
+---
+::: iterable_extensions.single_or_none
+---
 ::: iterable_extensions.to_dictionary
 ---
 ::: iterable_extensions.to_list
