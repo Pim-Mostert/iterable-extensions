@@ -7,6 +7,8 @@ from iterable_extensions.iterable_extensions import (
     first,
     first_or_none,
     group_by,
+    last,
+    last_or_none,
     order_by,
     order_by_descending,
     select,
@@ -318,3 +320,45 @@ def test_distinct():
     # Assert
     for _ in range(2):  # Test reusable iterable
         assert list(result) == [1, 3, 4, 7, 9]
+
+
+def test_last():
+    # Assign
+    source = [5, 8, 2]
+
+    # Act
+    result = source | last()
+
+    # Assert
+    assert result == 2
+
+
+def test_last_valueerror():
+    # Assign
+    source = []
+
+    # Act
+    with pytest.raises(ValueError):
+        source | last()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_last_or_none():
+    # Assign
+    source = [5, 8, 2]
+
+    # Act
+    result = source | last_or_none()
+
+    # Assert
+    assert result == 2
+
+
+def test_last_or_none_returns_none():
+    # Assign
+    source = []
+
+    # Act
+    result = source | last_or_none()
+
+    # Assert
+    assert result is None

@@ -17,6 +17,10 @@
 ---
 ::: iterable_extensions.order_by_descending
 ---
+::: iterable_extensions.last
+---
+::: iterable_extensions.last_or_none
+---
 ::: iterable_extensions.select
 ---
 ::: iterable_extensions.single

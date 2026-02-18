@@ -116,13 +116,12 @@ class distinct[T](Extension[Iterable[T], [], Iterable[T]]):
 
         def _distinct(source: Iterable[T]) -> Iterable[T]:
             def _func(source: Iterable[T]) -> Iterator[T]:
-                unique_values = set()
+                # unique_everseen - https://docs.python.org/3/library/itertools.html
+                seen = set()
 
-                for value in source:
-                    if value not in unique_values:
-                        unique_values.add(value)
-
-                        yield value
+                for element in itertools.filterfalse(seen.__contains__, source):
+                    seen.add(element)
+                    yield element
 
             return ReusableIterable(source, _func)
 
@@ -388,6 +387,78 @@ class first_or_none[T](Extension[Iterable[T], [], T | None]):
                 return None
 
         super().__init__(_first_or_none)
+
+
+class last[T](Extension[Iterable[T], [], T]):
+    def __init__(
+        self,
+    ):
+        """Find the last element of an iterable.
+
+        Raises:
+            ValueError: If the iterable contains no elements.
+
+        Example:
+            ```
+            source = [4, 7, 2]
+
+            result = source | last()
+
+            print(result)
+            # 2
+            ```
+        """
+
+        def _last(source: Iterable[T]) -> T:
+            iterator = iter(source)
+
+            try:
+                value = next(iterator)
+            except StopIteration:
+                raise ValueError("Iterable contains no elements.")
+
+            while True:
+                try:
+                    value = next(iterator)
+                except StopIteration:
+                    return value
+
+        super().__init__(_last)
+
+
+class last_or_none[T](Extension[Iterable[T], [], T | None]):
+    def __init__(
+        self,
+    ):
+        """Find the last element of an iterable, or returns None
+        if the iterable is empty.
+
+        Example:
+            ```
+            source = [4, 7, 2]
+
+            result = source | last_or_none()
+
+            print(result)
+            # 2
+            ```
+        """
+
+        def _last_or_none(source: Iterable[T]) -> T | None:
+            iterator = iter(source)
+
+            try:
+                value = next(iterator)
+            except StopIteration:
+                return None
+
+            while True:
+                try:
+                    value = next(iterator)
+                except StopIteration:
+                    return value
+
+        super().__init__(_last_or_none)
 
 
 class single[T](Extension[Iterable[T], [], T]):
