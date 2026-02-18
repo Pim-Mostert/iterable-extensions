@@ -3,6 +3,7 @@ import pytest
 from iterable_extensions.iterable_extensions import (
     count,
     first,
+    first_or_none,
     group_by,
     order_by,
     order_by_descending,
@@ -165,8 +166,7 @@ def test_first():
     result = source | first()
 
     # Assert
-    for _ in range(2):  # Test reusable iterable
-        assert result == 5
+    assert result == 5
 
 
 def test_first_valueerror():
@@ -176,3 +176,25 @@ def test_first_valueerror():
     # Act
     with pytest.raises(ValueError):
         source | first()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_first_or_none():
+    # Assign
+    source = [5, 8, 2]
+
+    # Act
+    result = source | first_or_none()
+
+    # Assert
+    assert result == 5
+
+
+def test_first_or_none_empty_iterable():
+    # Assign
+    source = []
+
+    # Act
+    result = source | first_or_none()
+
+    # Assert
+    assert result is None

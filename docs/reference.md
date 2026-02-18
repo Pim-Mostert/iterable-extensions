@@ -3,6 +3,10 @@
 ---
 ::: iterable_extensions.count
 ---
+::: iterable_extensions.first
+---
+::: iterable_extensions.first_or_none
+---
 ::: iterable_extensions.group_by
 ---
 ::: iterable_extensions.order_by

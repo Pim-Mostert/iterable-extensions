@@ -278,6 +278,33 @@ class first[T](Extension[Iterable[T], [], T]):
         super().__init__(_first)
 
 
+class first_or_none[T](Extension[Iterable[T], [], T | None]):
+    def __init__(
+        self,
+    ):
+        """Take the first element of an iterable. Returns None
+        if the iterable is empty.
+
+        Examples:
+            ```
+            source = [4, 7, 2]
+
+            result = source | first()
+
+            print(result)
+            # 4
+            ```
+        """
+
+        def _first(source: Iterable[T]) -> T | None:
+            try:
+                return next(iter(source))
+            except StopIteration:
+                return None
+
+        super().__init__(_first)
+
+
 class to_dictionary[T, TKey, TValue](
     Extension[
         Iterable[T],
