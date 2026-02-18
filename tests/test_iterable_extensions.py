@@ -1,12 +1,19 @@
 import pytest
 
 from iterable_extensions.iterable_extensions import (
+    any,
     count,
+    distinct,
     first,
+    first_or_none,
     group_by,
+    last,
+    last_or_none,
     order_by,
     order_by_descending,
     select,
+    single,
+    single_or_none,
     to_dictionary,
     to_list,
     where,
@@ -125,7 +132,7 @@ def test_group_by():
     ]
 
     # Act
-    groups = source | group_by[int, Person](lambda p: p.age)
+    groups = source | group_by[Person, int](lambda p: p.age)
 
     # Assert
     for _ in range(2):  # Test reusable iterable
@@ -165,8 +172,7 @@ def test_first():
     result = source | first()
 
     # Assert
-    for _ in range(2):  # Test reusable iterable
-        assert result == 5
+    assert result == 5
 
 
 def test_first_valueerror():
@@ -176,3 +182,183 @@ def test_first_valueerror():
     # Act
     with pytest.raises(ValueError):
         source | first()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_first_or_none():
+    # Assign
+    source = [5, 8, 2]
+
+    # Act
+    result = source | first_or_none()
+
+    # Assert
+    assert result == 5
+
+
+def test_first_or_none_empty_iterable():
+    # Assign
+    source = []
+
+    # Act
+    result = source | first_or_none()
+
+    # Assert
+    assert result is None
+
+
+def test_single():
+    # Assign
+    source = [5]
+
+    # Act
+    result = source | single()
+
+    # Assert
+    assert result == 5
+
+
+def test_single_more_than_one_element():
+    # Assign
+    source = [5, 4]
+
+    # Act
+    with pytest.raises(ValueError):
+        source | single()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_single_empty_iterable():
+    # Assign
+    source = []
+
+    # Act
+    with pytest.raises(ValueError):
+        source | single()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_single_or_none():
+    # Assign
+    source = [5]
+
+    # Act
+    result = source | single_or_none()
+
+    # Assert
+    assert result == 5
+
+
+def test_single_or_none_more_than_one_element():
+    # Assign
+    source = [5, 4]
+
+    # Act
+    with pytest.raises(ValueError):
+        source | single_or_none()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_single_or_none_empty_iterable():
+    # Assign
+    source = []
+
+    # Act
+    result = source | single_or_none()
+
+    # Assert
+    assert result is None
+
+
+def test_any_false():
+    # Assign
+    source = []
+
+    # Act
+    result = source | any()
+
+    # Assert
+    assert result is False
+
+
+def test_any_true():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | any()
+
+    # Assert
+    assert result is True
+
+
+def test_any_predicate_false():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | any[int](lambda x: x == 4)
+
+    # Assert
+    assert result is False
+
+
+def test_any_predicate_true():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | any[int](lambda x: x == 2)
+
+    # Assert
+    assert result is True
+
+
+def test_distinct():
+    # Assign
+    source = [1, 3, 4, 1, 3, 7, 9, 3, 7]
+
+    # Act
+    result = source | distinct()
+
+    # Assert
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == [1, 3, 4, 7, 9]
+
+
+def test_last():
+    # Assign
+    source = [5, 8, 2]
+
+    # Act
+    result = source | last()
+
+    # Assert
+    assert result == 2
+
+
+def test_last_valueerror():
+    # Assign
+    source = []
+
+    # Act
+    with pytest.raises(ValueError):
+        source | last()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_last_or_none():
+    # Assign
+    source = [5, 8, 2]
+
+    # Act
+    result = source | last_or_none()
+
+    # Assert
+    assert result == 2
+
+
+def test_last_or_none_returns_none():
+    # Assign
+    source = []
+
+    # Act
+    result = source | last_or_none()
+
+    # Assert
+    assert result is None

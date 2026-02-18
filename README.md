@@ -7,6 +7,7 @@ The extension methods are implemented using [https://pypi.org/project/extensionm
 Type-checking is supported, see [Type-checking](#Type-checking).
 
 Important notes:
+
 - Whereas `itertools` generally returns **iterators** that are exhausted after consuming once, `iterable-extensions` generally returns **iterables** that may be consumed repeatedly.
 - Similarly to `itertools`, `iterable-extensions` aims to evaluate lazily so that not the entire input iterable is loaded into memory. However, there are some notable exceptions, including:
   - `order_by` and `order_by_descending`
@@ -173,6 +174,7 @@ Note that the type annotations are only for static checkers. You can ignore thes
 In the API reference, you'll notice that all extension methods inherit from `Extension[TIn, **P, TOut]`. This class is the core of the `extensionsmethods` package ([https://pypi.org/project/extensionmethods/](https://pypi.org/project/extensionmethods/)). It provides the basic `|`-operator functionality.
 
 The `Extension` class has two type parameters and a paramspec:
+
 - `TIn`: The type that the extension is defined to operate on.
 - `**P`: Arbitrary number of arguments that the extension method may take.
 - `TOut`: The type of the return value of the extension method.
@@ -188,6 +190,7 @@ class select[TIn, TOut](
 ): ...
 ```
 we see that:
+
 - `TIn` = `Iterable[TIn]`. `select` is defined to operate on iterables of an arbitrary input type.
 - `**P` = `[Callable[[TIn], TOut]]`. `select` requires a mapping function as a parameter.
 - `TOut` = `Iterable[TOut]`. `select` returns an iterable of an arbitrary output type.

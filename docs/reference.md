@@ -1,7 +1,15 @@
 # API Reference
 
 ---
+::: iterable_extensions.any
+---
 ::: iterable_extensions.count
+---
+::: iterable_extensions.distinct
+---
+::: iterable_extensions.first
+---
+::: iterable_extensions.first_or_none
 ---
 ::: iterable_extensions.group_by
 ---
@@ -9,7 +17,15 @@
 ---
 ::: iterable_extensions.order_by_descending
 ---
+::: iterable_extensions.last
+---
+::: iterable_extensions.last_or_none
+---
 ::: iterable_extensions.select
+---
+::: iterable_extensions.single
+---
+::: iterable_extensions.single_or_none
 ---
 ::: iterable_extensions.to_dictionary
 ---
