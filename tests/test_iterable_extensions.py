@@ -1,6 +1,7 @@
 import pytest
 
 from iterable_extensions.iterable_extensions import (
+    any,
     count,
     first,
     first_or_none,
@@ -260,3 +261,25 @@ def test_single_or_none_empty_iterable():
 
     # Assert
     assert result is None
+
+
+def test_any_false():
+    # Assign
+    source = []
+
+    # Act
+    result = source | any()
+
+    # Assert
+    assert result is False
+
+
+def test_any_true():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | any()
+
+    # Assert
+    assert result is True

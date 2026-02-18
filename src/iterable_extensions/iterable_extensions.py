@@ -21,6 +21,30 @@ class ReusableIterable[TIn, TOut](Iterable[TOut]):
         return self._func(self._source)
 
 
+class any[T](Extension[Iterable[T], [], bool]):
+    def __init__(self):
+        """Whether the iterable contains any elements.
+
+        Example:
+            ```
+            source = [1, 1, 1, 1, 1]
+
+            print(source | any())
+            # True
+            ```
+        """
+
+        def _any(source: Iterable[T]) -> bool:
+            try:
+                next(iter(source))
+            except StopIteration:
+                return False
+
+            return True
+
+        super().__init__(_any)
+
+
 class count[T](Extension[Iterable[T], [], int]):
     def __init__(self):
         """Count the number of elements in an iterable.

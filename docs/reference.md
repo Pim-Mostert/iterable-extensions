@@ -3,6 +3,8 @@
 ---
 ::: iterable_extensions.count
 ---
+::: iterable_extensions.any
+---
 ::: iterable_extensions.first
 ---
 ::: iterable_extensions.first_or_none

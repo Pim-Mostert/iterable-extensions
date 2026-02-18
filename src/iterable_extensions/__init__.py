@@ -1,6 +1,7 @@
 from importlib.metadata import PackageNotFoundError, version
 
 from .iterable_extensions import (
+    any,
     count,
     first,
     first_or_none,
@@ -21,6 +22,7 @@ except PackageNotFoundError:
     __version__ = "noinstall"
 
 __all__ = [
+    "any",
     "count",
     "first",
     "first_or_none",
