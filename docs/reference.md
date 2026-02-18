@@ -1,9 +1,11 @@
 # API Reference
 
 ---
+::: iterable_extensions.any
+---
 ::: iterable_extensions.count
 ---
-::: iterable_extensions.any
+::: iterable_extensions.distinct
 ---
 ::: iterable_extensions.first
 ---

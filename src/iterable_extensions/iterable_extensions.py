@@ -21,28 +21,59 @@ class ReusableIterable[TIn, TOut](Iterable[TOut]):
         return self._func(self._source)
 
 
-class any[T](Extension[Iterable[T], [], bool]):
-    def __init__(self):
-        """Whether the iterable contains any elements.
+class any[T](Extension[Iterable[T], [Callable[[T], bool] | None], bool]):
+    @overload
+    def __init__(
+        self,
+    ): ...
+
+    @overload
+    def __init__(
+        self,
+        predicate: Callable[[T], bool] | None = None,
+    ): ...
+
+    def __init__(
+        self,
+        predicate: Callable[[T], bool] | None = None,
+    ):
+        """Whether the iterable contains any elements, or whether the iterable contains
+        any element that satisfies the predicate.
+
+        Args:
+            predicate (Callable[[T], bool] | None, optional): Function to evaluate per element. Defaults to None.
 
         Example:
             ```
-            source = [1, 1, 1, 1, 1]
+            source = [1, 2, 3]
 
-            print(source | any())
+            result = source | any[int](lambda x: x == 2)
+
+            print(result)
             # True
             ```
         """
 
-        def _any(source: Iterable[T]) -> bool:
-            try:
-                next(iter(source))
-            except StopIteration:
+        def _any(
+            source: Iterable[T],
+            predicate: Callable[[T], bool] | None,
+        ) -> bool:
+
+            if predicate:
+                for value in source:
+                    if predicate(value) is True:
+                        return True
+
                 return False
+            else:
+                try:
+                    next(iter(source))
+                except StopIteration:
+                    return False
 
-            return True
+                return True
 
-        super().__init__(_any)
+        super().__init__(_any, predicate)
 
 
 class count[T](Extension[Iterable[T], [], int]):
@@ -66,6 +97,36 @@ class count[T](Extension[Iterable[T], [], int]):
             return total
 
         super().__init__(_count)
+
+
+class distinct[T](Extension[Iterable[T], [], Iterable[T]]):
+    def __init__(self):
+        """Returns distinct elements from the iterable.
+
+        Example:
+            ```
+            source = [1, 3, 4, 1, 3, 7, 9, 3, 7]
+
+            result = source | distinct()
+
+            print(list(result))
+            # [1, 3, 4, 7, 9]
+            ```
+        """
+
+        def _distinct(source: Iterable[T]) -> Iterable[T]:
+            def _func(source: Iterable[T]) -> Iterator[T]:
+                unique_values = set()
+
+                for value in source:
+                    if value not in unique_values:
+                        unique_values.add(value)
+
+                        yield value
+
+            return ReusableIterable(source, _func)
+
+        super().__init__(_distinct)
 
 
 class group_by[T, TKey: SupportsComparison](

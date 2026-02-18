@@ -3,6 +3,7 @@ import pytest
 from iterable_extensions.iterable_extensions import (
     any,
     count,
+    distinct,
     first,
     first_or_none,
     group_by,
@@ -129,7 +130,7 @@ def test_group_by():
     ]
 
     # Act
-    groups = source | group_by[int, Person](lambda p: p.age)
+    groups = source | group_by[Person, int](lambda p: p.age)
 
     # Assert
     for _ in range(2):  # Test reusable iterable
@@ -283,3 +284,37 @@ def test_any_true():
 
     # Assert
     assert result is True
+
+
+def test_any_predicate_false():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | any[int](lambda x: x == 4)
+
+    # Assert
+    assert result is False
+
+
+def test_any_predicate_true():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | any[int](lambda x: x == 2)
+
+    # Assert
+    assert result is True
+
+
+def test_distinct():
+    # Assign
+    source = [1, 3, 4, 1, 3, 7, 9, 3, 7]
+
+    # Act
+    result = source | distinct()
+
+    # Assert
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == [1, 3, 4, 7, 9]

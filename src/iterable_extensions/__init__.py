@@ -3,6 +3,7 @@ from importlib.metadata import PackageNotFoundError, version
 from .iterable_extensions import (
     any,
     count,
+    distinct,
     first,
     first_or_none,
     group_by,
@@ -24,6 +25,7 @@ except PackageNotFoundError:
 __all__ = [
     "any",
     "count",
+    "distinct",
     "first",
     "first_or_none",
     "group_by",
