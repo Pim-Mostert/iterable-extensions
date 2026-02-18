@@ -48,7 +48,7 @@ class group_by[T, TKey: SupportsComparison](
     Extension[
         Iterable[T],
         [Callable[[T], TKey]],
-        Iterable[Grouping[TKey, T]],
+        Iterable[Grouping[T, TKey]],
     ]
 ):
     def __init__(
@@ -56,6 +56,8 @@ class group_by[T, TKey: SupportsComparison](
         key_selector: Callable[[T], TKey],
     ):
         """Group the elements in an iterable based on a key.
+
+        No prior sorting required.
 
         Args:
             key_selector (Callable[[T], TKey]): Function to generate the key for each element.
@@ -96,7 +98,7 @@ class group_by[T, TKey: SupportsComparison](
         def _group_by(
             source: Iterable[T],
             key_selector: Callable[[T], TKey],
-        ) -> Iterable[Grouping[TKey, T]]:
+        ) -> Iterable[Grouping[T, TKey]]:
             def _func(source: Iterable[T]) -> Iterator[Grouping]:
                 groups = itertools.groupby(
                     sorted(source, key=key_selector),
@@ -245,6 +247,35 @@ class select[TIn, TOut](
             return ReusableIterable(source, _func)
 
         super().__init__(_select, selector)
+
+
+class first[T](Extension[Iterable[T], [], T]):
+    def __init__(
+        self,
+    ):
+        """Take the first element of an iterable.
+
+        Raises:
+            ValueError: If the iterable contains no elements.
+
+        Example:
+            ```
+            source = [4, 7, 2]
+
+            result = source | first()
+
+            print(result)
+            # 4
+            ```
+        """
+
+        def _first(source: Iterable[T]) -> T:
+            try:
+                return next(iter(source))
+            except StopIteration:
+                raise ValueError("Iterable is empty.")
+
+        super().__init__(_first)
 
 
 class to_dictionary[T, TKey, TValue](

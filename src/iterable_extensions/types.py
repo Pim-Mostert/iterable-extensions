@@ -13,7 +13,7 @@ class SupportsLessThan[T](Protocol):
 SupportsComparison: TypeAlias = SupportsGreaterThan | SupportsLessThan
 
 
-class Grouping[TKey, T]:
+class Grouping[T, TKey](Iterable[T]):
     """A wrapper around an iterable, that also holds its grouping key.
 
     Args:
