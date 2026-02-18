@@ -1,5 +1,8 @@
+import pytest
+
 from iterable_extensions.iterable_extensions import (
     count,
+    first,
     group_by,
     order_by,
     order_by_descending,
@@ -152,3 +155,24 @@ def test_count():
 
     # Assert
     assert result == len(source)
+
+
+def test_first():
+    # Assign
+    source = [5, 8, 2]
+
+    # Act
+    result = source | first()
+
+    # Assert
+    for _ in range(2):  # Test reusable iterable
+        assert result == 5
+
+
+def test_first_valueerror():
+    # Assign
+    source = []
+
+    # Act
+    with pytest.raises(ValueError):
+        source | first()  # pyright: ignore[reportUnusedExpression]
