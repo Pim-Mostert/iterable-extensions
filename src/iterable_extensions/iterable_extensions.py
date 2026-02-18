@@ -29,7 +29,8 @@ class count[T](Extension[Iterable[T], [], int]):
             ```
             source = [1, 1, 1, 1, 1]
 
-            source | count() # returns 5
+            print(source | count())
+            # 5
             ```
         """
 
@@ -59,6 +60,11 @@ class group_by[T, TKey: SupportsComparison](
         Args:
             key_selector (Callable[[T], TKey]): Function to generate the key for each element.
 
+        Note:
+            While the returned `Grouping` object itself is an iterable that is evaluated lazily,
+            the elements within each individual group are materialized into list when their group
+            is iterated. This may lead to memory issues in case of a large number of elements.
+
         Example:
             ```
             @dataclass
@@ -76,12 +82,9 @@ class group_by[T, TKey: SupportsComparison](
                 Person(30, "Felice"),
             ]
 
-            grouped = source | group_by[Person, int](lambda x: x.age)
+            grouped = source | group_by[Person, int](lambda p: p.age)
 
             print(list(grouped))
-
-            # Returns:
-            #
             # [
             #   10: [Person(age=10, name='Arthur'), Person(age=10, name='Becky')],
             #   20: [Person(age=20, name='Chris')],
@@ -115,6 +118,40 @@ class order_by[T, TKey: SupportsComparison](
         self,
         key_selector: Callable[[T], TKey],
     ):
+        """Order the elements in an iterable based on a key in ascending order.
+
+        Args:
+            key_selector (Callable[[T], TKey]): Function to generate the key for each element.
+
+        Note:
+            `order_by` materializes the entire input iterable, i.e. does not evaluate lazily.
+            This may lead to memory issues in case of large iterables.
+
+        Example:
+            ```
+            @dataclass
+            class Person:
+                age: int
+                name: str
+
+            source = [
+                Person(31, "Arthur"),
+                Person(12, "Becky"),
+                Person(45, "Chris"),
+            ]
+
+            ordered = source | order_by[Person, int](lambda p: p.age)
+
+            print(list(ordered))
+            # [
+            #     Person(age=12, name='Becky'),
+            #     Person(age=31, name='Arthur'),
+            #     Person(age=45, name='Chris')
+            # ]
+
+            ```
+        """
+
         def _order_by(
             source: Iterable[T], key_selector: Callable[[T], TKey]
         ) -> Iterable[T]:
@@ -130,6 +167,40 @@ class order_by_descending[T, TKey: SupportsComparison](
         self,
         key_selector: Callable[[T], TKey],
     ):
+        """Order the elements in an iterable based on a key in descending order.
+
+        Args:
+            key_selector (Callable[[T], TKey]): Function to generate the key for each element.
+
+        Note:
+            `order_by_descending` materializes the entire input iterable, i.e. does not
+            evaluate lazily. This may lead to memory issues in case of large iterables.
+
+        Example:
+            ```
+            @dataclass
+            class Person:
+                age: int
+                name: str
+
+            source = [
+                Person(31, "Arthur"),
+                Person(12, "Becky"),
+                Person(45, "Chris"),
+            ]
+
+            ordered = source | order_by_descending[Person, int](lambda p: p.age)
+
+            print(list(ordered))
+            # [
+            #     Person(age=45, name='Chris')
+            #     Person(age=31, name='Arthur'),
+            #     Person(age=12, name='Becky'),
+            # ]
+
+            ```
+        """
+
         def _order_by(
             source: Iterable[T], key_selector: Callable[[T], TKey]
         ) -> Iterable[T]:
@@ -149,10 +220,20 @@ class select[TIn, TOut](
         self,
         selector: Callable[[TIn], TOut],
     ):
-        """This is the select class
+        """Transform each element in an iterable according to a selector function.
 
         Args:
-            selector (Callable[[TIn], TOut]): The selector
+            selector (Callable[[TIn], TOut]): Function to transform each element.
+
+        Example:
+        ```
+            source = [1, 2, 3, 4, 5]
+
+            transformed = source | select[int, str](lambda x: str(2 * x))
+
+            print(list(transformed))
+            # ['2', '4', '6', '8', '10']
+        ```
         """
 
         def _select(
@@ -191,11 +272,34 @@ class to_dictionary[T, TKey, TValue](
         key_selector: Callable[[T], TKey],
         value_selector: Callable[[T], TValue] | None = None,
     ):
-        """to_dictionary main
+        """Transform an iterable into a dictionary based on a key. Optionally transform each element.
 
         Args:
-            key_selector (Callable[[TIn], TKey]): _description_
-            value_selector (Callable[[TIn], TValue] | None, optional): _description_. Defaults to None.
+            key_selector (Callable[[TIn], TKey]): Function to generate key for each element.
+            value_selector (Callable[[TIn], TValue] | None, optional): Function to transform each element. Defaults to None.
+
+        Example:
+            ```
+            @dataclass
+            class Person:
+                age: int
+                name: str
+
+
+            source = [
+                Person(31, "Arthur"),
+                Person(12, "Becky"),
+                Person(45, "Chris"),
+            ]
+
+            dict = source | to_dictionary[Person, int, str](
+                lambda p: p.age,
+                lambda p: p.name.upper(),
+            )
+
+            print(dict)
+            # {31: 'ARTHUR', 12: 'BECKY', 45: 'CHRIS'}
+            ```
         """
         if value_selector:
 
@@ -226,6 +330,18 @@ class to_list[T](Extension[Iterable[T], [], list[T]]):
     def __init__(
         self,
     ):
+        """Materialize an iterable into a list.
+
+        Example:
+            ```
+            source = range(5)
+
+            lst = source | to_list()
+
+            print(lst)
+            # [0, 1, 2, 3, 4]
+            ```
+        """
         super().__init__(list)
 
 
@@ -240,14 +356,20 @@ class where[T](
         self,
         predicate: Callable[[T], bool],
     ):
-        """where
+        """Filter an iterable based on a predicate. Only elements for which the
+        predicate evaluates to true are included in the resulting iterable.
 
         Args:
-            predicate (Callable[[T], bool]): ja mooi
+            predicate (Callable[[T], bool]): Function to include an element.
 
         Example:
             ```
-            result = source | where[int](lambda x: x > 2)
+            source = [1, 2, 3, 4, 5]
+
+            filtered = source | where[int](lambda x: x > 3)
+
+            print(list(filtered))
+            # [4, 5]
             ```
         """
 
