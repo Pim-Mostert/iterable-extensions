@@ -9,6 +9,8 @@ from iterable_extensions.iterable_extensions import (
     group_by,
     last,
     last_or_none,
+    max,
+    min,
     order_by,
     order_by_descending,
     select,
@@ -204,6 +206,46 @@ def test_first_or_none_empty_iterable():
 
     # Assert
     assert result is None
+
+
+def test_max():
+    # Assign
+    source = [5, 8, 2]
+
+    # Act
+    result = source | max()
+
+    # Assert
+    assert result == 8
+
+
+def test_max_valueerror():
+    # Assign
+    source = []
+
+    # Act
+    with pytest.raises(ValueError):
+        source | max()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_min():
+    # Assign
+    source = [5, 8, 2, 7]
+
+    # Act
+    result = source | min()
+
+    # Assert
+    assert result == 2
+
+
+def test_min_valueerror():
+    # Assign
+    source = []
+
+    # Act
+    with pytest.raises(ValueError):
+        source | min()  # pyright: ignore[reportUnusedExpression]
 
 
 def test_single():

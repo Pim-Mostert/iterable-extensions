@@ -1,3 +1,4 @@
+import builtins
 import itertools
 from collections.abc import Callable, Iterable, Iterator
 from typing import cast, overload
@@ -459,6 +460,64 @@ class last_or_none[T](Extension[Iterable[T], [], T | None]):
                     return value
 
         super().__init__(_last_or_none)
+
+
+class max[T: SupportsComparison](Extension[Iterable[T], [], T]):
+    def __init__(
+        self,
+    ):
+        # """Takes the maximum value in an iterable
+
+        # Raises:
+        #     ValueError: If the iterable contains no elements.
+
+        # Example:
+        #     ```
+        #     source = [4, 7, 2]
+
+        #     result = source | max()
+
+        #     print(result)
+        #     # 7
+        #     ```
+        # """
+
+        def _max(source: Iterable[T]) -> T:
+            try:
+                return builtins.max(source)
+            except ValueError:
+                raise ValueError("Iterable is empty.")
+
+        super().__init__(_max)
+
+
+class min[T: SupportsComparison](Extension[Iterable[T], [], T]):
+    def __init__(
+        self,
+    ):
+        # """Takes the minimum value in an iterable
+
+        # Raises:
+        #     ValueError: If the iterable contains no elements.
+
+        # Example:
+        #     ```
+        #     source = [4, 7, 2]
+
+        #     result = source | min()
+
+        #     print(result)
+        #     # 2
+        #     ```
+        # """
+
+        def _min(source: Iterable[T]) -> T:
+            try:
+                return builtins.min(source)
+            except ValueError:
+                raise ValueError("Iterable is empty.")
+
+        super().__init__(_min)
 
 
 class single[T](Extension[Iterable[T], [], T]):
