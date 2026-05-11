@@ -21,6 +21,10 @@
 ---
 ::: iterable_extensions.last_or_none
 ---
+::: iterable_extensions.max
+---
+::: iterable_extensions.min
+---
 ::: iterable_extensions.select
 ---
 ::: iterable_extensions.single
