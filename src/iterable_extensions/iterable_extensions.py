@@ -466,21 +466,21 @@ class max[T: SupportsComparison](Extension[Iterable[T], [], T]):
     def __init__(
         self,
     ):
-        # """Takes the maximum value in an iterable
+        """Takes the maximum value in an iterable
 
-        # Raises:
-        #     ValueError: If the iterable contains no elements.
+        Raises:
+            ValueError: If the iterable contains no elements.
 
-        # Example:
-        #     ```
-        #     source = [4, 7, 2]
+        Example:
+            ```
+            source = [4, 7, 2]
 
-        #     result = source | max()
+            result = source | max()
 
-        #     print(result)
-        #     # 7
-        #     ```
-        # """
+            print(result)
+            # 7
+            ```
+        """
 
         def _max(source: Iterable[T]) -> T:
             try:
@@ -495,21 +495,21 @@ class min[T: SupportsComparison](Extension[Iterable[T], [], T]):
     def __init__(
         self,
     ):
-        # """Takes the minimum value in an iterable
+        """Takes the minimum value in an iterable
 
-        # Raises:
-        #     ValueError: If the iterable contains no elements.
+        Raises:
+            ValueError: If the iterable contains no elements.
 
-        # Example:
-        #     ```
-        #     source = [4, 7, 2]
+        Example:
+            ```
+            source = [4, 7, 2]
 
-        #     result = source | min()
+            result = source | min()
 
-        #     print(result)
-        #     # 2
-        #     ```
-        # """
+            print(result)
+            # 2
+            ```
+        """
 
         def _min(source: Iterable[T]) -> T:
             try:
