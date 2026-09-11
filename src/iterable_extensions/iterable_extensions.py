@@ -334,6 +334,78 @@ class select[TIn, TOut](
         super().__init__(_select, selector)
 
 
+class take[T](Extension[Iterable[T], [int], Iterable[T]]):
+    def __init__(
+        self,
+        count: int,
+    ):
+        """Take a specified number of elements from an iterable.
+
+        The resulting iterable contains at most `count` elements. If the iterable contains
+        fewer than `count` elements, all elements are included.
+
+        Raises:
+            ValueError: If `count` is negative.
+
+        Example:
+            ```
+            source = [1, 2, 3, 4, 5]
+
+            result = source | take[int](2)
+
+            print(list(result))
+            # [1, 2]
+            ```
+        """
+
+        def _take(source: Iterable[T], count: int) -> Iterable[T]:
+            def _func(source: Iterable[T]) -> Iterator[T]:
+                if count < 0:
+                    raise ValueError("count must be greater than or equal to zero.")
+
+                return itertools.islice(source, count)
+
+            return ReusableIterable(source, _func)
+
+        super().__init__(_take, count)
+
+
+class skip[T](Extension[Iterable[T], [int], Iterable[T]]):
+    def __init__(
+        self,
+        count: int,
+    ):
+        """Skip a specified number of elements in an iterable.
+
+        The resulting iterable contains all elements except the first `count` elements. If the
+        iterable contains fewer than `count` elements, the resulting iterable is empty.
+
+        Raises:
+            ValueError: If `count` is negative.
+
+        Example:
+            ```
+            source = [1, 2, 3, 4, 5]
+
+            result = source | skip[int](2)
+
+            print(list(result))
+            # [3, 4, 5]
+            ```
+        """
+
+        def _skip(source: Iterable[T], count: int) -> Iterable[T]:
+            def _func(source: Iterable[T]) -> Iterator[T]:
+                if count < 0:
+                    raise ValueError("count must be greater than or equal to zero.")
+
+                return itertools.islice(source, count, None)
+
+            return ReusableIterable(source, _func)
+
+        super().__init__(_skip, count)
+
+
 class first[T](Extension[Iterable[T], [], T]):
     def __init__(
         self,
