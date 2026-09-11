@@ -16,6 +16,8 @@ from iterable_extensions.iterable_extensions import (
     select,
     single,
     single_or_none,
+    skip,
+    take,
     to_dictionary,
     to_list,
     where,
@@ -404,3 +406,69 @@ def test_last_or_none_returns_none():
 
     # Assert
     assert result is None
+
+
+def test_skip():
+    # Assign
+    source = [1, 2, 3, 4, 5]
+
+    # Act
+    result = source | skip[int](2)
+
+    # Assert
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == [3, 4, 5]
+
+
+def test_skip_more_than_count():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | skip[int](5)
+
+    # Assert
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == []
+
+
+def test_skip_negative_count():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    with pytest.raises(ValueError):
+        source | skip[int](-1) | to_list[int]()  # pyright: ignore[reportUnusedExpression]
+
+
+def test_take():
+    # Assign
+    source = [1, 2, 3, 4, 5]
+
+    # Act
+    result = source | take[int](2)
+
+    # Assert
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == [1, 2]
+
+
+def test_take_more_than_count():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    result = source | take[int](5)
+
+    # Assert
+    for _ in range(2):  # Test reusable iterable
+        assert list(result) == [1, 2, 3]
+
+
+def test_take_negative_count():
+    # Assign
+    source = [1, 2, 3]
+
+    # Act
+    with pytest.raises(ValueError):
+        source | take[int](-1) | to_list[int]()  # pyright: ignore[reportUnusedExpression]

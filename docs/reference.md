@@ -31,6 +31,10 @@
 ---
 ::: iterable_extensions.single_or_none
 ---
+::: iterable_extensions.skip
+---
+::: iterable_extensions.take
+---
 ::: iterable_extensions.to_dictionary
 ---
 ::: iterable_extensions.to_list
